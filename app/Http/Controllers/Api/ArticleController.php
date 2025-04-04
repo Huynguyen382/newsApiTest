@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\ArticleModel;
 use App\Http\Requests\CreateArticleRequest;
 use Illuminate\Support\Facades\Auth;
+
+/**
+ * @group Article Management
+ * 
+ * APIs for managing articles
+ */
 class ArticleController extends Controller
 {
     public function getAllArticle()

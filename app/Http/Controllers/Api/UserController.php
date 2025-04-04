@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @group User Management
+ * 
+ * APIs for managing users
+ */
 class UserController extends Controller
 {
     public function login(LoginRequest $request)

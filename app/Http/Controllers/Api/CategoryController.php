@@ -7,6 +7,11 @@ use App\Http\Requests\CreateCategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\Response;
 
+/**
+ * @group Category Management
+ * 
+ * APIs for managing categories
+ */
 class CategoryController extends Controller
 {
     protected $categoryService;
