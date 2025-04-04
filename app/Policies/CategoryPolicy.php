@@ -11,7 +11,6 @@ class CategoryPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view any categories.
      *
      * @param  \App\Models\userModel  $user
      * @return bool
@@ -22,8 +21,6 @@ class CategoryPolicy
     }
 
     /**
-     * Determine whether the user can view the category.
-     *
      * @param  \App\Models\userModel  $user
      * @param  \App\Models\CategoryModel  $category
      * @return bool
