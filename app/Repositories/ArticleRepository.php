@@ -13,7 +13,7 @@ class ArticleRepository implements ArticleRepositoryInterface
         $this->model = $model;
     }
 
-    public function getAll()
+    public function getAllArticles()
     {
         return $this->model->all();
     }
@@ -54,5 +54,9 @@ class ArticleRepository implements ArticleRepositoryInterface
     public function getByAuthorId($authorId)
     {
         return $this->model->where('user_id', $authorId)->get();
+    }
+    public function getArticleById($id)
+    {
+        return $this->model->find($id);
     }
 } 

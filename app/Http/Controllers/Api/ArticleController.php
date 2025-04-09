@@ -27,7 +27,7 @@ class ArticleController extends Controller
          *
          * @return JsonResponse
          */
-        public function getAllArticles(): JsonResponse
+        public function getAllArticle(): JsonResponse
         {
                 $articles = $this->articleService->getAllArticles();
                 return response()->json($articles, 200);

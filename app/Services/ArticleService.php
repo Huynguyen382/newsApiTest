@@ -26,7 +26,7 @@ class ArticleService implements ArticleServiceInterface
      */     
     public function getAllArticles()
     {
-        return $this->articleRepository->getAll();
+        return $this->articleRepository->getAllArticles();
     }
 
     /**

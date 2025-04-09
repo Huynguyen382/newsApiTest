@@ -53,7 +53,7 @@ class userModel extends BaseAuthenticatableModel implements JWTSubject
      *
      * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
     }
@@ -85,7 +85,7 @@ class userModel extends BaseAuthenticatableModel implements JWTSubject
      * @param array $roles
      * @return bool
      */
-    public function hasAnyRole(array $roles)
+    public function hasAnyRole(array $roles): bool
     {
         return in_array($this->role, $roles);
     }

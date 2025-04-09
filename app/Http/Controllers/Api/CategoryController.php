@@ -7,7 +7,7 @@ use App\Http\Requests\CreateCategoryRequest;
 use App\Services\CategoryServiceInterface;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\UpdateCategoryRequest;
-use App\Models\CategoryModel;
+use App\Models\userModel;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -31,7 +31,9 @@ class CategoryController extends Controller
      */
     public function getAllCategories(): JsonResponse
     {
-        if (!Auth::check()) {
+        /**@var userModel $user */
+        $user = Auth::user();
+        if (!$user->isAuthenticated()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         
@@ -45,12 +47,15 @@ class CategoryController extends Controller
      * @param CreateCategoryRequest $request
      * @return JsonResponse
      */
+    
     public function createCategory(CreateCategoryRequest $request): JsonResponse
     {
-        if (!Auth::check() || !Auth::user()->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
+        /**@var userModel $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        
+
         $category = $this->categoryService->createCategory($request->all());
         return response()->json($category, 201);
     }
@@ -64,7 +69,9 @@ class CategoryController extends Controller
      */
     public function updateCategory(UpdateCategoryRequest $request, $id): JsonResponse
     {
-        if (!Auth::check() || !Auth::user()->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
+        /**@var userModel $user */
+        $user = Auth::user();
+        if (!$user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         
@@ -80,7 +87,9 @@ class CategoryController extends Controller
      */
     public function deleteCategory($id): JsonResponse
     {
-        if (!Auth::check() || !Auth::user()->isAdmin()) {
+        /**@var userModel $user */
+        $user = Auth::user();
+        if (!$user->isAdmin()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         
