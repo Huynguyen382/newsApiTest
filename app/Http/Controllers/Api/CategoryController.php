@@ -4,8 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCategoryRequest;
-use App\Services\CategoryService;
-use Illuminate\Support\Facades\Response;
+use App\Services\CategoryServiceInterface;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\UpdateCategoryRequest;
+use App\Models\CategoryModel;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @group Category Management
@@ -16,50 +19,72 @@ class CategoryController extends Controller
 {
     protected $categoryService;
 
-    public function __construct(CategoryService $categoryService)
+    public function __construct(CategoryServiceInterface $categoryService)
     {
         $this->categoryService = $categoryService;
     }
 
-    public function getAllCategories()
+    /**
+     * Get all categories
+     *
+     * @return JsonResponse
+     */
+    public function getAllCategories(): JsonResponse
     {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
         $categories = $this->categoryService->getAllCategories();
-        return Response::json($categories, 200);
+        return response()->json($categories, 200);
     }
 
-    public function createCategory(CreateCategoryRequest $request)
+    /**
+     * Create a new category
+     *
+     * @param CreateCategoryRequest $request
+     * @return JsonResponse
+     */
+    public function createCategory(CreateCategoryRequest $request): JsonResponse
     {
-        try {
-            $category = $this->categoryService->createCategory($request->validated());
-            return Response::json($category, 201);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], 403);
+        if (!Auth::check() || !Auth::user()->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
+        
+        $category = $this->categoryService->createCategory($request->all());
+        return response()->json($category, 201);
     }
 
-    public function updateCategory(CreateCategoryRequest $request, $id)
+    /**
+     * Update a category
+     *
+     * @param CreateCategoryRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function updateCategory(UpdateCategoryRequest $request, $id): JsonResponse
     {
-        try {
-            $category = $this->categoryService->updateCategory($id, $request->validated());
-            if (!$category) {
-                return Response::json(['error' => 'Không tìm thấy danh mục'], 404);
-            }
-            return Response::json($category, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], 403);
+        if (!Auth::check() || !Auth::user()->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
+        
+        $category = $this->categoryService->updateCategory($id, $request->all());
+        return response()->json($category, 200);
     }
 
-    public function deleteCategory($id)
+    /**
+     * Delete a category
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function deleteCategory($id): JsonResponse
     {
-        try {
-            $result = $this->categoryService->deleteCategory($id);
-            if (!$result) {
-                return Response::json(['error' => 'Không tìm thấy danh mục'], 404);
-            }
-            return Response::json(['message' => 'Xóa danh mục thành công'], 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], 400);
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
+        
+        $this->categoryService->deleteCategory($id);
+        return response()->json(['message' => 'Category deleted successfully'], 200);
     }
 }

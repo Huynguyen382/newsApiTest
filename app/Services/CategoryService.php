@@ -3,10 +3,8 @@
 namespace App\Services;
 
 use App\Repositories\CategoryRepositoryInterface;
-use Illuminate\Support\Facades\Auth;
-use App\Models\userModel;
 
-class CategoryService
+class CategoryService implements CategoryServiceInterface
 {
     protected $categoryRepository;
 
@@ -15,45 +13,77 @@ class CategoryService
         $this->categoryRepository = $categoryRepository;
     }
 
+    /**
+     * Get all categories
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getAllCategories()
     {
-        return $this->categoryRepository->getWithArticleCount();
+        return $this->categoryRepository->getAll();
     }
 
+    /**
+     * Find a category by ID
+     *
+     * @param int $id
+     * @return \App\Models\CategoryModel
+     */
+    
+    public function findCategory($id)
+    {
+        return $this->categoryRepository->find($id);
+    }
+
+    /**
+     * Create a new category
+     *
+     * @param array $data
+     * @return \App\Models\CategoryModel
+     */
     public function createCategory(array $data)
     {
-        $user = Auth::user();
-        if (!$user || $user->role !== 'admin') {
-            throw new \Exception('Bạn không có quyền thực hiện thao tác này');
+        if ($this->categoryRepository->findByUrlKey($data['url_key'])) {
+            throw new \Exception('URL key đã tồn tại.', 422);
         }
+
         return $this->categoryRepository->create($data);
     }
 
+    /**
+     * Update a category
+     *
+     * @param int $id
+     * @param array $data
+     * @return \App\Models\CategoryModel
+     */
     public function updateCategory($id, array $data)
     {
-        $user = Auth::user();
-        if (!$user || $user->role !== 'admin') {
-            throw new \Exception('Bạn không có quyền thực hiện thao tác này');
+        $this->categoryRepository->find($id);
+
+        $existingCategory = $this->categoryRepository->findByUrlKey($data['url_key']);
+        if ($existingCategory && $existingCategory->id !== $id) {
+            throw new \Exception('URL key đã tồn tại.', 422);
         }
+
         return $this->categoryRepository->update($id, $data);
     }
 
+    /**
+     * Delete a category
+     *
+     * @param int $id
+     * @return bool
+     */
     public function deleteCategory($id)
     {
-        $user = Auth::user();
-        if (!$user || $user->role !== 'admin') {
-            throw new \Exception('Bạn không có quyền thực hiện thao tác này');
-        }
-        
-        $category = $this->categoryRepository->find($id);
-        if (!$category) {
-            throw new \Exception('Không tìm thấy danh mục');
-        }
+        $category = $this->findCategory($id);
 
-        if ($category->articles_count > 0) {
-            throw new \Exception('Không thể xóa danh mục vì có bài viết');
+        if ($category->articles()->count() > 0) {
+            throw new \Exception('Không thể xóa danh mục có bài viết', 422);
         }
 
         return $this->categoryRepository->delete($id);
     }
+
 } 

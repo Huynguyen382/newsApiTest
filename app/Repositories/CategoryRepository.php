@@ -51,4 +51,9 @@ class CategoryRepository implements CategoryRepositoryInterface
     {
         return $this->model->withCount('articles')->get();
     }
+
+    public function findByUrlKey($urlKey)
+    {
+        return $this->model->where('url_key', $urlKey)->first();
+    }
 } 

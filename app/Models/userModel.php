@@ -4,10 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class userModel extends Authenticatable implements JWTSubject
+class userModel extends BaseAuthenticatableModel implements JWTSubject
 {
     use HasFactory;
 
@@ -16,10 +15,16 @@ class userModel extends Authenticatable implements JWTSubject
     protected $hidden = ['password'];
     public $timestamps = false;
 
+    // Role constants
+    const ROLE_ADMIN = 'admin';
+    const ROLE_AUTHOR = 'author';
+    const ROLE_USER = 'user';
+
     public function articles():HasMany
     {
         return $this->hasMany(ArticleModel::class);
     }
+    
     public function comments(): HasMany
     {
         return $this->hasMany(CommentModel::class);
@@ -33,8 +38,55 @@ class userModel extends Authenticatable implements JWTSubject
         return [];
     }
 
+    /**
+     * Check if user is authenticated
+     *
+     * @return bool
+     */
+    public function isAuthenticated()
+    {
+        return true; // If the user model exists, it's authenticated
+    }
+
+    /**
+     * Check if user is an admin
+     *
+     * @return bool
+     */
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Check if user is an author
+     *
+     * @return bool
+     */
+    public function isAuthor()
+    {
+        return $this->role === self::ROLE_AUTHOR;
+    }
+
+    /**
+     * Check if user has a specific role
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if user has any of the specified roles
+     *
+     * @param array $roles
+     * @return bool
+     */
+    public function hasAnyRole(array $roles)
+    {
+        return in_array($this->role, $roles);
     }
 }

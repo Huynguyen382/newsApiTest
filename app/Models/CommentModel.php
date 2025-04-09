@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class CommentModel extends Model
+class CommentModel extends BaseModel
 {
     use HasFactory;
     protected $table = 'comments';

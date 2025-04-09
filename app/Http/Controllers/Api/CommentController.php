@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\CommentRepositoryInterface;
+use App\Services\CommentServiceInterface;
 use Illuminate\Support\Facades\Response;
 use App\Http\Requests\CreateCommentRequest;
 use Illuminate\Support\Facades\Log;
@@ -15,66 +15,100 @@ use Illuminate\Support\Facades\Log;
  */
 class CommentController extends Controller
 {
-    protected $commentRepository;
+    protected $commentService;
 
-    public function __construct(CommentRepositoryInterface $commentRepository)
+    public function __construct(CommentServiceInterface $commentService)
     {
-        $this->commentRepository = $commentRepository;
+        $this->commentService = $commentService;
     }
 
     public function getAllComments()
     {
-       $comments = $this->commentRepository->getAll();
-       return Response::json($comments, 200);
+        try {
+            $comments = $this->commentService->getAllComments();
+            return Response::json($comments, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
+
     public function createComment(CreateCommentRequest $request)
     {
-        $comment = $this->commentRepository->create($request->all());
-        return Response::json($comment, 201);
+        try {
+            $comment = $this->commentService->createComment($request->all());
+            return Response::json($comment, 201);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
+
     public function updateComment(CreateCommentRequest $request, $id)
     {
-        $comment = $this->commentRepository->update($id, $request->all());
-        
-        if (!$comment) {
-            return Response::json(['error' => 'Comment not found'], 404);
+        try {
+            $comment = $this->commentService->updateComment($id, $request->all());
+            return Response::json($comment, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
         }
-        
-        return Response::json($comment, 200);
     }
+
     public function getCommentByArticleId($articleId)
     {
-        $comments = $this->commentRepository->getByArticleId($articleId);
-        return Response::json($comments, 200);
+        try {
+            $comments = $this->commentService->getCommentsByArticle($articleId);
+            return Response::json($comments, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
+
     public function getCommentByUserId($userId)
     {
-        $comments = $this->commentRepository->getByUserId($userId);
-        return Response::json($comments, 200);
+        try {
+            $comments = $this->commentService->getCommentsByUser($userId);
+            return Response::json($comments, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
+
     public function getCommentById($id)
     {
-        $comment = $this->commentRepository->find($id);
-        return Response::json($comment, 200);
+        try {
+            $comment = $this->commentService->findComment($id);
+            return Response::json($comment, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
 
     public function deleteComment($id)
     {
-        $comment = $this->commentRepository->delete($id);
-        if (!$comment) {
-            return Response::json(['error' => 'Comment not found'], 404);
+        try {
+            $this->commentService->deleteComment($id);
+            return Response::json(['message' => 'Comment deleted successfully'], 204);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
         }
-        $comment->delete();
-        return Response::json(['message' => 'Comment deleted'], 204);
     }
+
     public function approveComment($id)
     {
-        $comment = $this->commentRepository->approve($id);
-        return Response::json($comment, 200);
+        try {
+            $comment = $this->commentService->approveComment($id);
+            return Response::json($comment, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
+
     public function rejectComment($id)
     {
-        $comment = $this->commentRepository->reject($id);
-        return Response::json($comment, 200);
+        try {
+            $comment = $this->commentService->rejectComment($id);
+            return Response::json($comment, 200);
+        } catch (\Exception $e) {
+            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+        }
     }
 }

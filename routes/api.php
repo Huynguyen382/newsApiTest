@@ -1,24 +1,25 @@
 <?php
-use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\API\ArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::put('users/{id}', [UserController::class, 'updateUser']);
     Route::delete('users/{id}', [UserController::class, 'deleteUser']);
-});//pass
+});
 
-Route::get('categories', [CategoryController::class, 'getAllCategories']);
-Route::middleware(['auth:api', 'admin'])->group(function () {
+Route::middleware('auth:api')->group(function () {
+    Route::get('categories', [CategoryController::class, 'getAllCategories']);
     Route::post('categories', [CategoryController::class, 'createCategory']);
     Route::put('categories/{id}', [CategoryController::class, 'updateCategory']);
     Route::delete('categories/{id}', [CategoryController::class, 'deleteCategory']);
-});//pass
+});
 
 Route::get('comments', [CommentController::class, 'getAllComments']); 
 Route::middleware('auth:api')->group(function () {

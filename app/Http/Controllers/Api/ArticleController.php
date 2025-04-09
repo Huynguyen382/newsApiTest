@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\ArticleModel;
-use App\Http\Requests\CreateArticleRequest;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\updateArticleRequest;
+use App\Services\ArticleServiceInterface;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\deleteArticleRequest;
 
 /**
  * @group Article Management
@@ -14,74 +15,99 @@ use Illuminate\Support\Facades\Auth;
  */
 class ArticleController extends Controller
 {
-    public function getAllArticle()
-    {
-        $articles = ArticleModel::all();
-        return response()->json($articles, 200);
-    }
-    public function getArticleById($id)
-    {
-         $article = ArticleModel::find($id);
-         if(!$article) {
-             return response()->json(['error' => 'Article not found'], 404);
-         }
-         return response()->json($article, 200);
-    }
-   public function createArticle (CreateArticleRequest $request)
-   {
-        $user = Auth::user();
-        if($user->role != 'admin' && $user->role != 'author') {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        $validated = $request->validated();
+        protected $articleService;
 
-        $article = ArticleModel::create($validated);
-        return response()->json($article, 201);
-   }
-   public function updateArticle( CreateArticleRequest $request, $id)
-   {
-        $user = Auth::user();
-        if ($user->role != 'admin' && $user->role != 'author') {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        public function __construct(ArticleServiceInterface $articleService)
+        {
+                $this->articleService = $articleService;
         }
 
-        $article = ArticleModel::find($id);
-        if (!$article) {
-            return response()->json(['error' => 'Article not found'], 404);
+        /**
+         * Get all articles
+         *
+         * @return JsonResponse
+         */
+        public function getAllArticles(): JsonResponse
+        {
+                $articles = $this->articleService->getAllArticles();
+                return response()->json($articles, 200);
         }
 
-        $validated = $request->validated();
+        /**
+         * Get a single article by ID
+         *
+         * @param int $id
+         * @return JsonResponse
+         */
+        public function getArticleById($id): JsonResponse
+        {
+                $article = $this->articleService->getArticleById($id);
+                return response()->json($article, 200);
+        }
 
-        $article->update($validated);
-        return response()->json($article);
-   }
-   public function deleteArticle($id) 
-   {
-       $user = Auth::user();
-       if ($user->role != 'admin') {
-           return response()->json(['error' => 'Unauthorized'], 401);
-       }
+        /**
+         * Create a new article
+         *
+         * @param updateArticleRequest $request
+         * @return JsonResponse
+         */
+        public function createArticle(updateArticleRequest $request): JsonResponse
+        {
+                try {
+                        $article = $this->articleService->createArticle(
+                                $request->validated(),
+                                $request->user()->id
+                        );
+                        return response()->json($article, 201);
+                } catch (\Exception $e) {
+                        return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+                }
+        }
 
-       $article = ArticleModel::find($id);
-       if (!$article) {
-           return response()->json(['error' => 'Article not found'], 404);
-       }
+        /**
+         * Update an article
+         *
+         * @param updateArticleRequest $request
+         * @param int $id
+         * @return JsonResponse
+         */
+        public function updateArticle(updateArticleRequest $request, $id): JsonResponse
+        {
+                try {
+                        $article = $this->articleService->updateArticle(
+                                $id,
+                                $request->validated(),
+                                $request->user()->id
+                        );
+                        return response()->json($article, 200);
+                } catch (\Exception $e) {
+                        return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+                }
+        }
+        public function destroy(deleteArticleRequest $request, $id): JsonResponse
+        {
+                try {
+                        $this->articleService->deleteArticle($id, $request->user()->id);
+                        return response()->json(['message' => 'Bài viết đã được xóa thành công'], 200);
+                } catch (\Exception $e) {
+                        return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
+                }
+        }
 
-       $article->delete();
-       return response()->json(['message' => 'Article deleted successfully'], 200);
-   }
+        public function getAllArticleByCategory($id)
+        {
+                return $this->articleService->getByCategoryId($id);
+        }
 
-  
-   public function getAllArticleByCategory($id) 
-   {
-     $articles = ArticleModel::where('category_id', $id)->get();
-       return response()->json($articles, 200);
-   }
-   public function getAllArticleByAuthor($id) 
-   {
-     $articles = ArticleModel::where('author_id', $id)->get();
-       return response()->json($articles, 200);
-   }
+        public function getAllArticleByAuthor($id)
+        {
 
+                $articles = $this->articleService->getArticlesByAuthor($id);
+                return response()->json($articles, 200);
+        }
 
+        public function getArticlesByCategory($id)
+        {
+                return $this->articleService->getByCategoryId($id);
+        }
 }

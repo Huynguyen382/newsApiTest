@@ -19,7 +19,7 @@ class CheckCommentPermission
 
         if (Auth::user()->role == 'admin') {
             return $next($request);
-        }
+        }   
 
         if (Auth::id() !== $comment->user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);

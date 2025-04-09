@@ -2,13 +2,16 @@
 
 namespace App\Repositories;
 
-interface CategoryRepositoryInterface
+use App\Models\userModel;
+
+interface UserRepositoryInterface
 {
     public function getAll();
     public function find($id);
     public function create(array $data);
     public function update($id, array $data);
     public function delete($id);
-    public function getWithArticleCount();
-    public function findByUrlKey($urlKey);
+    public function findByEmail($email);
+    public function updatePassword($id, $password);
+    public function getWithRoles();
 } 
