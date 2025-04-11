@@ -2,85 +2,108 @@
 
 namespace App\Policies;
 
-use App\Models\userModel;
 use App\Models\ArticleModel;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Models\userModel;
 use Illuminate\Auth\Access\Response;
 
 class ArticlePolicy
 {
-    use HandlesAuthorization;
-
-    public function viewAny(userModel $user)
+    // public function __construct()
+    // {
+    //     dd('test');
+    // }
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(userModel $userModel = null,  ArticleModel $articleModel = null): Response
     {
         return Response::allow();
     }
 
-    public function view(userModel $user, ArticleModel $article)
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(userModel $userModel = null, ArticleModel $articleModel = null): bool
     {
-        if ($article->status === 'published') {
-            return Response::allow();
-        }
-        
-        return $user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR]) 
-            ? Response::allow() 
-            : Response::deny('Bạn không có quyền xem bài viết này.');
+        return true;
     }
 
-    public function create(userModel $user)
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(userModel $userModel): Response
     {
-        return $user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('Bạn không có quyền tạo bài viết.');
+            : Response::deny('You do not have permission to create articles.');
     }
 
-    public function update(userModel $user, ArticleModel $article)
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(userModel $userModel, ArticleModel $articleModel): Response
     {
-        if ($user->hasRole(userModel::ROLE_ADMIN)) {
-            return Response::allow();
-        }
-
-        if ($user->hasRole(userModel::ROLE_AUTHOR) && $article->user_id === $user->id) {
-            return Response::allow();
-        }
-
-        return Response::deny('Bạn không có quyền cập nhật bài viết này.');
-    }
-
-    public function delete(userModel $user, ArticleModel $article)
-    {
-        if (!$user->hasRole(userModel::ROLE_ADMIN)) {
-            return Response::deny('Chỉ quản trị viên mới có quyền xóa bài viết.');
-        }
-        
-        return Response::allow();
-    }
-
-    public function publish(userModel $user, ArticleModel $article)
-    {
-        return $user->hasRole(userModel::ROLE_ADMIN)
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('Chỉ quản trị viên mới có quyền xuất bản bài viết.');
+            : Response::deny('You do not have permission to update articles.');
     }
 
-    public function restore(userModel $user, ArticleModel $article)
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(userModel $userModel): Response
     {
-        return $user->hasRole(userModel::ROLE_ADMIN)
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('Chỉ quản trị viên mới có quyền khôi phục bài viết.');
+            : Response::deny('You do not have permission to delete articles.');
     }
 
-    public function forceDelete(userModel $user, ArticleModel $article)
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(userModel $userModel, ArticleModel $articleModel): Response
     {
-        return $user->hasRole(userModel::ROLE_ADMIN)
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('Chỉ quản trị viên mới có quyền xóa vĩnh viễn bài viết.');
+            : Response::deny('You do not have permission to restore articles.');
     }
 
-    public function manageComments(userModel $user, ArticleModel $article)
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(userModel $userModel, ArticleModel $articleModel): Response
     {
-        return $user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('Bạn không có quyền quản lý bình luận của bài viết này.');
+            : Response::deny('You do not have permission to force delete articles.');
     }
-} 
+
+    public function publish(userModel $userModel, ArticleModel $articleModel): Response
+    {
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to publish articles.');
+    }
+
+    public function unpublish(userModel $userModel, ArticleModel $articleModel): Response
+    {
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to unpublish articles.');
+    }
+
+    public function approve(userModel $userModel, ArticleModel $articleModel): Response
+    {
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to approve articles.');
+    }
+
+    public function reject(userModel $userModel, ArticleModel $articleModel): Response
+    {
+        return $userModel->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to reject articles.');
+    }
+
+}

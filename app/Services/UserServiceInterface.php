@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\userModel;
-
 interface UserServiceInterface
 {
     public function getAllUsers();

@@ -15,6 +15,7 @@ use App\Services\CategoryService;
 use App\Services\CategoryServiceInterface;
 use App\Services\CommentService;
 use App\Services\CommentServiceInterface;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +27,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ArticleRepositoryInterface::class, ArticleRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(CommentRepositoryInterface::class, CommentRepository::class);
-
         $this->app->bind(ArticleServiceInterface::class, function ($app) {
             return new ArticleService($app->make(ArticleRepositoryInterface::class));
         });
@@ -45,6 +45,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(\App\Models\CategoryModel::class, \App\Policies\CategoryPolicy::class);
+        Gate::policy(\App\Models\ArticleModel::class, \App\Policies\ArticlePolicy::class);
+        Gate::policy(\App\Models\CommentModel::class, \App\Policies\CommentPolicy::class);
+        Gate::policy(\App\Models\UserModel::class, \App\Policies\UserPolicy::class);
     }
 }

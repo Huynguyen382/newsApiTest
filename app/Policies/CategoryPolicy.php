@@ -2,80 +2,77 @@
 
 namespace App\Policies;
 
-use App\Models\userModel;
 use App\Models\CategoryModel;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Models\UserModel;
 use Illuminate\Auth\Access\Response;
 
 class CategoryPolicy
 {
-    use HandlesAuthorization;
-
     /**
-     * Determine whether the user can view any categories.
-     *
-     * @param  \App\Models\userModel  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * Determine whether the user can view any models.
      */
-    public function viewAny(userModel $user)
+    public function viewAny(UserModel $user): Response
     {
-        return true;
-    }
-
-    /**
-     * Determine whether the user can view the category.
-     *
-     * @param  \App\Models\userModel  $user
-     * @param  \App\Models\CategoryModel  $category
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(userModel $user, CategoryModel $category)
-    {
-        return $user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR, userModel::ROLE_USER]);
-    }
-
-    /**
-     * Determine whether the user can create categories.
-     *
-     * @param  \App\Models\userModel  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(userModel $user)
-    {
-        return $user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])
+        return $user->hasAnyRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR, UserModel::ROLE_USER])
             ? Response::allow()
-            : Response::deny('Bạn không có quyền tạo danh mục.');
+            : Response::deny('You do not have permission to view categories.');
     }
 
     /**
-     * Determine whether the user can update the category.
-     *
-     * @param  \App\Models\userModel  $user
-     * @param  \App\Models\CategoryModel  $category
-     * @return \Illuminate\Auth\Access\Response|bool
+     * Determine whether the user can view the model.
      */
-    public function update(userModel $user, CategoryModel $category)
+    public function view(UserModel $user, CategoryModel $category): Response
     {
-        return $user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR]);
-    }
-
-    /**
-     * Determine whether the user can delete the category.
-     *
-     * @param  \App\Models\userModel  $user
-     * @param  \App\Models\CategoryModel  $category
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(userModel $user, CategoryModel $category)
-    {
-        if (!$user->isAdmin()) {
-            return Response::deny('Only administrators can delete categories.');
-        }
-        
-        if ($category->articles_count > 0) {
-            return Response::deny('Cannot delete a category that contains articles.');
-        }
-        
         return Response::allow();
     }
-} 
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(UserModel $user): Response
+    {   
+        return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to create categories.');
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(UserModel $user, CategoryModel $category): Response
+    {
+        return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to update this category.');
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(UserModel $user, CategoryModel $category): Response
+    {
+        return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to delete this category.');
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(UserModel $user, CategoryModel $category): Response
+    {
+        return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to restore this category.');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(UserModel $user, CategoryModel $category): Response
+    {
+        return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
+            ? Response::allow()
+            : Response::deny('You do not have permission to permanently delete this category.');
+    }
+}

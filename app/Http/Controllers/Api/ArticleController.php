@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\updateArticleRequest;
+use App\Http\Requests\CreateArticleRequest;
+use App\Http\Requests\UpdateArticleRequest;
 use App\Services\ArticleServiceInterface;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\deleteArticleRequest;
+use App\Http\Requests\DeleteArticleRequest;     
+use App\Models\ArticleModel;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @group Article Management
@@ -29,6 +32,7 @@ class ArticleController extends Controller
          */
         public function getAllArticle(): JsonResponse
         {
+                Gate::authorize('viewAny', ArticleModel::class);
                 $articles = $this->articleService->getAllArticles();
                 return response()->json($articles, 200);
         }
@@ -41,6 +45,7 @@ class ArticleController extends Controller
          */
         public function getArticleById($id): JsonResponse
         {
+                $this->authorize('view', ArticleModel::class);
                 $article = $this->articleService->getArticleById($id);
                 return response()->json($article, 200);
         }
@@ -48,66 +53,59 @@ class ArticleController extends Controller
         /**
          * Create a new article
          *
-         * @param updateArticleRequest $request
+         * @param UpdateArticleRequest $request
          * @return JsonResponse
          */
-        public function createArticle(updateArticleRequest $request): JsonResponse
+        public function createArticle(UpdateArticleRequest $request): JsonResponse
         {
-                try {
-                        $article = $this->articleService->createArticle(
-                                $request->validated(),
-                                $request->user()->id
-                        );
-                        return response()->json($article, 201);
-                } catch (\Exception $e) {
-                        return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-                }
+                $this->authorize('create', ArticleModel::class);
+                $article = $this->articleService->createArticle(
+                        $request->validated(),
+                        $request->user()->id
+                );
+                return response()->json($article, 201);
         }
 
         /**
          * Update an article
          *
-         * @param updateArticleRequest $request
+         * @param UpdateArticleRequest $request
          * @param int $id
          * @return JsonResponse
          */
-        public function updateArticle(updateArticleRequest $request, $id): JsonResponse
+        public function updateArticle(CreateArticleRequest $request, $id): JsonResponse
         {
-                try {
-                        $article = $this->articleService->updateArticle(
-                                $id,
-                                $request->validated(),
-                                $request->user()->id
-                        );
-                        return response()->json($article, 200);
-                } catch (\Exception $e) {
-                        return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-                }
+               Gate::authorize('update', ArticleModel::class);
+                $article = $this->articleService->updateArticle(
+                        $id,
+                        $request->validated(),
+                        $request->user()->id
+                );
+                return response()->json($article, 200);
         }
-        public function destroy(deleteArticleRequest $request, $id): JsonResponse
+        public function deleteArticle(DeleteArticleRequest $request, $id): JsonResponse
         {
-                try {
-                        $this->articleService->deleteArticle($id, $request->user()->id);
-                        return response()->json(['message' => 'Bài viết đã được xóa thành công'], 200);
-                } catch (\Exception $e) {
-                        return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-                }
+                $this->authorize('delete', ArticleModel::class);
+                $this->articleService->deleteArticle($id, $request->user()->id);
+                return response()->json(['message' => 'Bài viết đã được xóa thành công'], 200);
         }
 
         public function getAllArticleByCategory($id)
         {
+                $this->authorize('view', ArticleModel::class);
                 return $this->articleService->getByCategoryId($id);
         }
 
         public function getAllArticleByAuthor($id)
         {
-
+                $this->authorize('view', ArticleModel::class);
                 $articles = $this->articleService->getArticlesByAuthor($id);
                 return response()->json($articles, 200);
         }
 
         public function getArticlesByCategory($id)
         {
+                $this->authorize('view', ArticleModel::class);
                 return $this->articleService->getByCategoryId($id);
         }
 }

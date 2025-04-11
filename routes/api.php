@@ -15,7 +15,7 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('categories', [CategoryController::class, 'getAllCategories']);
+    Route::get('/categories', [CategoryController::class, 'getAllCategories']);
     Route::post('categories', [CategoryController::class, 'createCategory']);
     Route::put('categories/{id}', [CategoryController::class, 'updateCategory']);
     Route::delete('categories/{id}', [CategoryController::class, 'deleteCategory']);

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\CommentServiceInterface;
 use Illuminate\Support\Facades\Response;
 use App\Http\Requests\CreateCommentRequest;
-use Illuminate\Support\Facades\Log;
+use App\Models\CommentModel;
 
 /**
  * @group Comment Management
@@ -24,91 +24,64 @@ class CommentController extends Controller
 
     public function getAllComments()
     {
-        try {
-            $comments = $this->commentService->getAllComments();
-            return Response::json($comments, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('viewAny', CommentModel::class);
+        $comments = $this->commentService->getAllComments();
+        return response()->json($comments, 200);
     }
 
     public function createComment(CreateCommentRequest $request)
     {
-        try {
-            $comment = $this->commentService->createComment($request->all());
-            return Response::json($comment, 201);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+       $this->authorize('create', CommentModel::class);
+       $comment = $this->commentService->createComment($request->all());
+       return response()->json($comment, 201);
     }
 
     public function updateComment(CreateCommentRequest $request, $id)
     {
-        try {
-            $comment = $this->commentService->updateComment($id, $request->all());
-            return Response::json($comment, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('update', CommentModel::class);
+        $comment = $this->commentService->updateComment($id, $request->all());
+        return response()->json($comment, 200);
     }
 
     public function getCommentByArticleId($articleId)
     {
-        try {
-            $comments = $this->commentService->getCommentsByArticle($articleId);
-            return Response::json($comments, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('view', CommentModel::class);
+        $comments = $this->commentService->getCommentsByArticle($articleId);
+        return response()->json($comments, 200);
     }
 
     public function getCommentByUserId($userId)
     {
-        try {
-            $comments = $this->commentService->getCommentsByUser($userId);
-            return Response::json($comments, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('view', CommentModel::class);
+        $comments = $this->commentService->getCommentsByUser($userId);
+        return response()->json($comments, 200);
     }
 
     public function getCommentById($id)
     {
-        try {
-            $comment = $this->commentService->findComment($id);
-            return Response::json($comment, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('view', CommentModel::class);
+        $comment = $this->commentService->findComment($id);
+        return response()->json($comment, 200);
     }
 
     public function deleteComment($id)
     {
-        try {
-            $this->commentService->deleteComment($id);
-            return Response::json(['message' => 'Comment deleted successfully'], 204);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('delete', CommentModel::class);
+        $this->commentService->deleteComment($id);
+        return response()->json(['message' => 'Comment deleted successfully'], 204);
     }
 
     public function approveComment($id)
     {
-        try {
-            $comment = $this->commentService->approveComment($id);
-            return Response::json($comment, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('approve', CommentModel::class);
+        $comment = $this->commentService->approveComment($id);
+        return response()->json($comment, 200);
     }
 
     public function rejectComment($id)
     {
-        try {
-            $comment = $this->commentService->rejectComment($id);
-            return Response::json($comment, 200);
-        } catch (\Exception $e) {
-            return Response::json(['error' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $this->authorize('reject', CommentModel::class);
+        $comment = $this->commentService->rejectComment($id);
+        return response()->json($comment, 200);
     }
 }

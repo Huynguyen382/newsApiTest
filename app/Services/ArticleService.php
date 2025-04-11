@@ -49,12 +49,24 @@ class ArticleService implements ArticleServiceInterface
      */
     public function createArticle(array $data, $userId)
     {
-        if (!$this->canManageArticle($userId, $data['role'])) {
+        $data['url_key'] = $this->generateUrlKey($data['title']);
+
+        if (!$this->canManageArticle($userId, 'admin','author')) {
             throw new \Exception('Bạn không có quyền tạo bài viết.', 401);
         }
 
         $data['user_id'] = $userId;
-        return $this->articleRepository->create($data); 
+        return $this->articleRepository->create($data);
+    }
+
+    /**
+     *
+     * @param string $title
+     * @return string
+     */
+    protected function generateUrlKey(string $title): string
+    {
+        return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title)));
     }
 
     /**
@@ -67,12 +79,7 @@ class ArticleService implements ArticleServiceInterface
      */
     public function updateArticle($id, array $data, $userId)
     {
-        $this->getArticleById($id);
-            
-        if (!$this->canManageArticle($userId, $data['role'])) {
-            throw new \Exception('Bạn không có quyền cập nhật bài viết.', 401);
-        }
-
+        $this->getArticleById($id);            
         return $this->articleRepository->update($id, $data);
     }
 

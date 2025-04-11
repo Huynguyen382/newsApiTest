@@ -7,8 +7,8 @@ use App\Http\Requests\CreateCategoryRequest;
 use App\Services\CategoryServiceInterface;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\UpdateCategoryRequest;
-use App\Models\userModel;
-use Illuminate\Support\Facades\Auth;
+use App\Models\CategoryModel;
+
 
 /**
  * @group Category Management
@@ -31,12 +31,7 @@ class CategoryController extends Controller
      */
     public function getAllCategories(): JsonResponse
     {
-        /**@var userModel $user */
-        $user = Auth::user();
-        if (!$user->isAuthenticated()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        
+        $this->authorize('viewAny', CategoryModel::class);
         $categories = $this->categoryService->getAllCategories();
         return response()->json($categories, 200);
     }
@@ -47,15 +42,10 @@ class CategoryController extends Controller
      * @param CreateCategoryRequest $request
      * @return JsonResponse
      */
-    
+
     public function createCategory(CreateCategoryRequest $request): JsonResponse
     {
-        /**@var userModel $user */
-        $user = Auth::user();
-        if (!$user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
+        $this->authorize('create', CategoryModel::class);
         $category = $this->categoryService->createCategory($request->all());
         return response()->json($category, 201);
     }
@@ -69,12 +59,7 @@ class CategoryController extends Controller
      */
     public function updateCategory(UpdateCategoryRequest $request, $id): JsonResponse
     {
-        /**@var userModel $user */
-        $user = Auth::user();
-        if (!$user->hasAnyRole([userModel::ROLE_ADMIN, userModel::ROLE_AUTHOR])) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        
+        $this->authorize('update', CategoryModel::class);
         $category = $this->categoryService->updateCategory($id, $request->all());
         return response()->json($category, 200);
     }
@@ -87,12 +72,7 @@ class CategoryController extends Controller
      */
     public function deleteCategory($id): JsonResponse
     {
-        /**@var userModel $user */
-        $user = Auth::user();
-        if (!$user->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        
+        $this->authorize('delete', CategoryModel::class);
         $this->categoryService->deleteCategory($id);
         return response()->json(['message' => 'Category deleted successfully'], 200);
     }

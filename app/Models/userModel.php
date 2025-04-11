@@ -76,6 +76,9 @@ class userModel extends BaseAuthenticatableModel implements JWTSubject
      */
     public function hasRole($role)
     {
+        if (is_array($role)) {
+            return in_array($this->role, $role);
+        }
         return $this->role === $role;
     }
 

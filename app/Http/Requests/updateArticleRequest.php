@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
-class updateArticleRequest extends FormRequest
+class UpdateArticleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,7 @@ class updateArticleRequest extends FormRequest
             'title' => 'required|string',
             'content' => 'required|string',
             'category_id' => 'required|integer|exists:categories,id',
-            'author_id' => 'required|integer|exists:users,id',
+            // 'author_id' => 'required|integer|exists:users,id',
         ];
     }
     public function messages(): array
@@ -41,12 +41,12 @@ class updateArticleRequest extends FormRequest
             'author_id.exists' => 'Tác giả không tồn tại.',
         ];
     }
-    public function checkArticleExists($id)
-    {
-        return Validator::make(['id' => $id], [
-            'id' => 'required|integer|exists:articles,id',
-            Rule::exists('articles', 'id'),
-        ])->passes();
-    }
+    // public function checkArticleExists($id)
+    // {
+    //     return Validator::make(['id' => $id], [
+    //         'id' => 'required|integer|exists:articles,id',
+    //         Rule::exists('articles', 'id'),
+    //     ])->passes();
+    // }
 }
 
