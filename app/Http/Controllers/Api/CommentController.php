@@ -4,7 +4,6 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Services\CommentServiceInterface;
-use Illuminate\Support\Facades\Response;
 use App\Http\Requests\CreateCommentRequest;
 use App\Models\CommentModel;
 
@@ -43,26 +42,6 @@ class CommentController extends Controller
         return response()->json($comment, 200);
     }
 
-    public function getCommentByArticleId($articleId)
-    {
-        $this->authorize('view', CommentModel::class);
-        $comments = $this->commentService->getCommentsByArticle($articleId);
-        return response()->json($comments, 200);
-    }
-
-    public function getCommentByUserId($userId)
-    {
-        $this->authorize('view', CommentModel::class);
-        $comments = $this->commentService->getCommentsByUser($userId);
-        return response()->json($comments, 200);
-    }
-
-    public function getCommentById($id)
-    {
-        $this->authorize('view', CommentModel::class);
-        $comment = $this->commentService->findComment($id);
-        return response()->json($comment, 200);
-    }
 
     public function deleteComment($id)
     {

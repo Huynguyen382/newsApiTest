@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\UserModel;
+use App\Policies\UserPolicy;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\ArticleRepository;
 use App\Repositories\ArticleRepositoryInterface;
@@ -48,6 +50,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\CategoryModel::class, \App\Policies\CategoryPolicy::class);
         Gate::policy(\App\Models\ArticleModel::class, \App\Policies\ArticlePolicy::class);
         Gate::policy(\App\Models\CommentModel::class, \App\Policies\CommentPolicy::class);
-        Gate::policy(\App\Models\UserModel::class, \App\Policies\UserPolicy::class);
+        Gate::policy(UserModel::class, UserPolicy::class);
     }
 }

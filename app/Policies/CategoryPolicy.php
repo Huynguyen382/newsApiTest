@@ -33,7 +33,7 @@ class CategoryPolicy
     {   
         return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('You do not have permission to create categories.');
+            : Response::deny('Bạn không có quyền tạo danh mục.');
     }
 
     /**
@@ -43,7 +43,7 @@ class CategoryPolicy
     {
         return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('You do not have permission to update this category.');
+            : Response::deny('Bạn không có quyền cập nhật danh mục này.');
     }
 
     /**
@@ -53,7 +53,7 @@ class CategoryPolicy
     {
         return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('You do not have permission to delete this category.');
+            : Response::deny('Bạn không có quyền xóa danh mục này.');
     }
 
     /**
@@ -63,7 +63,7 @@ class CategoryPolicy
     {
         return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('You do not have permission to restore this category.');
+            : Response::deny('Bạn không có quyền khôi phục danh mục này.');
     }
 
     /**
@@ -73,6 +73,6 @@ class CategoryPolicy
     {
         return $user->hasRole([UserModel::ROLE_ADMIN, UserModel::ROLE_AUTHOR])
             ? Response::allow()
-            : Response::deny('You do not have permission to permanently delete this category.');
+            : Response::deny('Bạn không có quyền xóa vĩnh viễn danh mục này.');
     }
 }

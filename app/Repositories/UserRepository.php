@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Models\userModel;
+use App\Models\UserModel;
 use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
 {
     protected $model;
 
-    public function __construct(userModel $model)
+    public function __construct(UserModel $model)
     {
         $this->model = $model;
     }

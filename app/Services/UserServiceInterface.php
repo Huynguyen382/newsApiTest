@@ -4,15 +4,40 @@ namespace App\Services;
 
 interface UserServiceInterface
 {
-    public function getAllUsers();
-    public function findUser($id);
-    public function createUser(array $data);
-    public function updateUser($id, array $data);
-    public function deleteUser($id);
-    public function findByEmail($email);
-    public function updatePassword($id, $password);
-    public function getUsersWithRoles();
-    public function authenticate($email, $password);
+    /**
+     * Login a user
+     *
+     * @param array $data
+     * @return \App\Models\User
+     */
+    public function login(array $data);
+    /**
+     * Register a new user
+     *
+     * @param array $data
+     * @return \App\Models\User
+     */
     public function register(array $data);
+    /**
+     * Get all users
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllUsers();
+    /**
+     * Update a user
+     *
+     * @param array $data
+     * @param int $id
+     * @return \App\Models\User
+     */
+    public function updateUser(array $data, $id);
+    /**
+     * Delete a user
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function deleteUser($id);
 } 
  

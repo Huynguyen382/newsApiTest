@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\userModel;
+use App\Models\UserModel;
 
 class AdminMiddleware
 {
@@ -17,7 +17,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === userModel::ROLE_ADMIN) {
+        if (Auth::check() && Auth::user()->role === UserModel::ROLE_ADMIN) {
             return $next($request);
         }
 

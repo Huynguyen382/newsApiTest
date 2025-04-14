@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class userModel extends BaseAuthenticatableModel implements JWTSubject
+class UserModel extends BaseAuthenticatableModel implements JWTSubject
 {
     use HasFactory;
 
@@ -18,7 +18,7 @@ class userModel extends BaseAuthenticatableModel implements JWTSubject
     // Role constants
     const ROLE_ADMIN = 'admin';
     const ROLE_AUTHOR = 'author';
-    const ROLE_USER = 'user';
+    const ROLE_USER = 'reader';
 
     public function articles():HasMany
     {

@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\userModel;
-
 interface UserRepositoryInterface
 {
     public function getAll();
